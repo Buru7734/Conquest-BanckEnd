@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from .models import Hero, Shield
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,3 +18,16 @@ class UserSerializer(serializers.ModelSerializer):
         )
         
         return user
+    
+class HeroSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True) 
+    
+    class Meta:
+        model = Hero
+        fields = '__all__'
+        
+class ShieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Shield
+        fields = '__all__'
+        read_only_fields = ('hero',)
