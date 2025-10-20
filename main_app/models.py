@@ -28,7 +28,9 @@ class Weapon(models.Model):
         choices=WEAPONS,
         default=WEAPONS[0][0]
     )
-    
+    strength = models.IntegerField()
+    defense = models.IntegerField()
+    speed = models.IntegerField()
     def __str__(self):
         return self.name
 
@@ -39,6 +41,9 @@ class Shield(models.Model):
         choices=SHIELDS,
         default=SHIELDS[0][0]
     )
+    strength = models.IntegerField()
+    defense = models.IntegerField()
+    speed = models.IntegerField()
     
     def __str__(self):
         return self.name
