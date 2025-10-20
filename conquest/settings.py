@@ -31,9 +31,6 @@ CORS_ALLOWED_ORIGINS = [
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -110,8 +107,12 @@ SIMPLE_JWT = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backend.postgresql',
-        'NAME': 'Conquest',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'conquest',
+        # 'USER': 'conquest_admin',
+        # 'PASSWORD': 'password',
+        # 'HOST': 'localhost',
+        # 'PORT': '5432',
     }
 }
 
