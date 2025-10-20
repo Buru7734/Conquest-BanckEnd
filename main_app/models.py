@@ -6,23 +6,19 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import User
 
 CHARACTERS = (
-    ('A', 'A_one'),
-    ('B', 'B_two'),
-    ('C', 'C_three'),
-    ('D', 'D_four'),
-    ('E', 'E_five')
-              )
-
-SHIELDS = (
-    ('S1', 'Shield1'),
-    ('S2', 'Shield2'),
-    ('S3', 'Shield3')
+    ('A', 'Holy Paladin'),
+    ('B', 'Primal Barbarian'),
+    ('C', 'Dragon Knight'),
 )
-
+SHIELDS = (
+    ('S1', 'Oceans Defender'),
+    ('S2', 'Skyward Kite'),
+    ('S3', 'Earthguard Tower')
+)
 WEAPONS = (
-    ('W1', 'weapon1'),
-    ('W2', 'weapon2'),
-    ('W3', 'weapon3')
+    ('W1', 'Natures Chopper'),
+    ('W2', 'Fireborn Spear'),
+    ('W3', 'Frostblade Claymore')
 )
 
 class Weapon(models.Model):
