@@ -110,8 +110,8 @@ SIMPLE_JWT = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backend.postgresql',
-        'NAME': 'Conquest',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'conquest',
     }
 }
 
