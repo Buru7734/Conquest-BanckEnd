@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from rest_framework import generics, status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from .serializers import UserSerializer, HeroSerializer, ShieldSerializer
-from .models import Hero, Shield
+from .serializers import UserSerializer, HeroSerializer, ShieldSerializer, WeaponSerializer
+from .models import Hero, Shield, Weapon
 
 
 class Home(APIView):
@@ -76,15 +76,38 @@ class HeroDetails(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'
     
 class ShieldList(generics.ListCreateAPIView):
-    queryset = Hero.objects.all()
+    queryset = Shield.objects.all()
     serializer_class = ShieldSerializer
     
-class ShieldDetails(generics.ListCreateAPIView):
-    queryset = Hero.objects.all()
+class ShieldDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Shield.objects.all()
     serializer_class = ShieldSerializer
     lookup_field = 'id'
     
-class addShieldToHero(APIView):
+class WeaponList(generics.ListCreateAPIView):
+    queryset = Weapon.objects.all()
+    serializer_class = WeaponSerializer
+    
+class WeaponDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Weapon.objects.all()
+    serializer_class = WeaponSerializer
+    lookup_field = 'id'
+    
+class AddWeaponToHero(APIView):
+    def post(self, request, hero_id, weapon_id):
+        hero = Hero.objects.get(id=hero_id)
+        weapon = Weapon.objects.get(id=weapon_id)
+        hero.weapons.add(weapon)
+        return Response({'message': f'Weapon {weapon.weapon} added to Hero {hero.name}'})
+    
+class RemoveWeaponFromHero(APIView):
+    def post(self, request, hero_id, weapon_id):
+        hero = Hero.objects.get(id=hero_id)
+        weapon = Weapon.objects.get(id=weapon_id)
+        hero.weapons.remove(weapon)
+        return Response({'message': f'Weapon {weapon.weapon} removed from Hero {hero.name}'})  
+    
+class AddShieldToHero(APIView):
     def post(self, request, hero_id, shield_id):
         hero = Hero.objects.get(id=hero_id)
         shield = Shield.objects.get(id=shield_id)

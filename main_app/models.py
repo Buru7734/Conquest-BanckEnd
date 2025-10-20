@@ -19,11 +19,29 @@ SHIELDS = (
     ('S3', 'Shield3')
 )
 
+WEAPONS = (
+    ('W1', 'weapon1'),
+    ('W2', 'weapon2'),
+    ('W3', 'weapon3')
+)
+
+class Weapon(models.Model):
+    name = models.CharField(max_length=50)
+    weapon = models.CharField(
+        max_length=2,
+        choices=WEAPONS,
+        default=WEAPONS[0][0]
+    )
+    
+    def __str__(self):
+        return self.name
+
 class Shield(models.Model):
+    name = models.CharField(max_length=50)
     shield = models.CharField(
-        max_length=1,
-        choices=CHARACTERS,
-        default=CHARACTERS[0][0]
+        max_length=2,
+        choices=SHIELDS,
+        default=SHIELDS[0][0]
     )
     
     def __str__(self):
@@ -36,6 +54,7 @@ class Hero(models.Model):
     speed = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     shields = models.ManyToManyField(Shield)
+    weapons = models.ManyToManyField(Weapon)
     character = models.CharField(
         max_length=1,
         choices=CHARACTERS,
