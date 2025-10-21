@@ -22,6 +22,10 @@ class CreateUserView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         user = User.objects.get(username=response.data['username'])
+        
+        # ✅ Create a corresponding Gold record for the new user
+        Gold.objects.get_or_create(user=user, defaults={"amount": 10})
+        
         refresh = RefreshToken.for_user(user)
         return Response({
             'refresh': str(refresh),
@@ -95,26 +99,41 @@ class WeaponDetails(generics.RetrieveUpdateDestroyAPIView):
     
 class GoldList(generics.ListCreateAPIView):
     serializer_class = GoldSerializer
-    queryset = Gold.objects.all()    
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Ensure only the logged-in user's gold is returned
+        return Gold.objects.filter(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        # Return a single object instead of a list
+        gold = self.get_queryset().first()
+        if gold:
+            serializer = self.get_serializer(gold)
+            return Response(serializer.data)
+        return Response({"detail": "No gold record found."}, status=404)   
     
 class GoldDetails(generics.RetrieveUpdateDestroyAPIView):
-    def get(self, request, id):
-        try:
-            gold = Gold.Objects.get(hero_id=id)
-            serializer = GoldSerializer(gold)
-            return Response(serializer.data)
-        except Gold.DoesNotExist:
-            return Response({"detail": "Gold not found"}, status=404)
-    def put(self, request, id):
-        try:
-            gold = Gold.objects.get(hero__id=id)
-            serializer = GoldSerializer(gold, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Gold.DoesNotExist:
-            return Response({"detail": "Gold not found"}, status=status.HTTP_404_NOT_FOUND)
+    queryset = Gold.objects.all()
+    serializer_class = GoldSerializer
+    lookup_field = 'id'
+    # def get(self, request, id):
+    #     try:
+    #         gold = Gold.Objects.get(hero_id=id)
+    #         serializer = GoldSerializer(gold)
+    #         return Response(serializer.data)
+    #     except Gold.DoesNotExist:
+    #         return Response({"detail": "Gold not found"}, status=404)
+    # def put(self, request, id):
+    #     try:
+    #         gold = Gold.objects.get(hero__id=id)
+    #         serializer = GoldSerializer(gold, data=request.data, partial=True)
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             return Response(serializer.data)
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #     except Gold.DoesNotExist:
+    #         return Response({"detail": "Gold not found"}, status=status.HTTP_404_NOT_FOUND)
         
 class AddWeaponToHero(APIView):
     def post(self, request, hero_id, weapon_id):

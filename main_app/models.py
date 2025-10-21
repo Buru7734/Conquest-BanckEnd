@@ -66,7 +66,7 @@ class Hero(models.Model):
     
 class Gold(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    amount = models.CharField(max_length=100)
+    amount = models.IntegerField(default=10)
     
     def __str__(self):
         return self.amount
