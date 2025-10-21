@@ -61,6 +61,16 @@ class VerifyUserView(APIView):
           'access': str(refresh.access_token),
           'user': UserSerializer(user).data
       })
+
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class PublicHeroList(generics.ListAPIView):
+    queryset = Hero.objects.all()
+    serializer_class = HeroSerializer
+    permission_classes = [permissions.AllowAny]
       
 class HeroList(generics.ListCreateAPIView):
     
