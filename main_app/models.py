@@ -2,9 +2,6 @@ from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
 
-# Create your models here.
-from django.contrib.auth.models import User
-
 CHARACTERS = (
     ('A', 'Holy Paladin'),
     ('B', 'Primal Barbarian'),
@@ -31,6 +28,7 @@ class Weapon(models.Model):
     strength = models.IntegerField()
     defense = models.IntegerField()
     speed = models.IntegerField()
+    # cost = models.IntegerField()
     def __str__(self):
         return self.name
 
@@ -44,6 +42,7 @@ class Shield(models.Model):
     strength = models.IntegerField()
     defense = models.IntegerField()
     speed = models.IntegerField()
+    # cost = models.IntegerField()
     
     def __str__(self):
         return self.name
@@ -61,8 +60,13 @@ class Hero(models.Model):
         choices=CHARACTERS,
         default=CHARACTERS[0][0]
     )
-
     
     def __str__(self):
         return self.name
     
+class Gold(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    amount = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.amount

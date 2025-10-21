@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from rest_framework import generics, status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from .serializers import UserSerializer, HeroSerializer, ShieldSerializer, WeaponSerializer
-from .models import Hero, Shield, Weapon
+from .serializers import UserSerializer, HeroSerializer, ShieldSerializer, WeaponSerializer, GoldSerializer
+from .models import Hero, Shield, Weapon, Gold
 
 
 class Home(APIView):
@@ -93,6 +93,29 @@ class WeaponDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = WeaponSerializer
     lookup_field = 'id'
     
+class GoldList(generics.ListCreateAPIView):
+    serializer_class = GoldSerializer
+    queryset = Gold.objects.all()    
+    
+class GoldDetails(generics.RetrieveUpdateDestroyAPIView):
+    def get(self, request, id):
+        try:
+            gold = Gold.Objects.get(hero_id=id)
+            serializer = GoldSerializer(gold)
+            return Response(serializer.data)
+        except Gold.DoesNotExist:
+            return Response({"detail": "Gold not found"}, status=404)
+    def put(self, request, id):
+        try:
+            gold = Gold.objects.get(hero__id=id)
+            serializer = GoldSerializer(gold, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Gold.DoesNotExist:
+            return Response({"detail": "Gold not found"}, status=status.HTTP_404_NOT_FOUND)
+        
 class AddWeaponToHero(APIView):
     def post(self, request, hero_id, weapon_id):
         hero = Hero.objects.get(id=hero_id)
