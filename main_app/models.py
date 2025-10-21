@@ -28,7 +28,7 @@ class Weapon(models.Model):
     strength = models.IntegerField()
     defense = models.IntegerField()
     speed = models.IntegerField()
-    # cost = models.IntegerField()
+    cost = models.IntegerField()
     def __str__(self):
         return self.name
 
@@ -42,7 +42,7 @@ class Shield(models.Model):
     strength = models.IntegerField()
     defense = models.IntegerField()
     speed = models.IntegerField()
-    # cost = models.IntegerField()
+    cost = models.IntegerField()
     
     def __str__(self):
         return self.name
