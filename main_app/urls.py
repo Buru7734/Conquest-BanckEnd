@@ -1,13 +1,15 @@
 from django.urls import path
-from .views import Home, HeroList, HeroDetails,ShieldList,AddShieldToHero,RemoveShieldFromHero, ShieldDetails,WeaponList, WeaponDetails, AddWeaponToHero, RemoveWeaponFromHero,GoldDetails,GoldList, CreateUserView, LoginView, VerifyUserView
+from .views import Home, HeroList, HeroDetails,ShieldList,AddShieldToHero,RemoveShieldFromHero, ShieldDetails,WeaponList, WeaponDetails, AddWeaponToHero, RemoveWeaponFromHero,GoldDetails,GoldList, CreateUserView, LoginView, VerifyUserView, UserListView, PublicHeroList
 
 
 urlpatterns = [
     path('', Home.as_view(), name='home'),
+    path('users/', UserListView.as_view(), name='user-list'),
     path('users/register/', CreateUserView.as_view(), name='register'),
     path('users/login/', LoginView.as_view(), name='login'),
     path('users/token/refresh/', VerifyUserView.as_view(), name='token_refresh'),
     path('heroes/', HeroList.as_view(), name='hero-list'),
+    path('heroes/public/', PublicHeroList.as_view(), name='public-hero-list'),
     path('heroes/<int:id>/', HeroDetails.as_view(), name='hero-details'),
     path('shields/', ShieldList.as_view(), name='Shield-List'),
     path('shields/<int:id>/', ShieldDetails.as_view(), name='Shield-details'),
