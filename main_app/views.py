@@ -121,30 +121,36 @@ class GoldList(generics.ListCreateAPIView):
         if gold:
             serializer = self.get_serializer(gold)
             return Response(serializer.data)
-        return Response({"detail": "No gold record found."}, status=404)   
+        return Response({"detail": "No gold record found."}, status=404)
+
+
+class UserGoldDetails(generics.RetrieveAPIView):
+    serializer_class = GoldSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'user_id'
+    
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return Gold.objects.filter(user=user_id)
     
 class GoldDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Gold.objects.all()
     serializer_class = GoldSerializer
+    permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id'
-    # def get(self, request, id):
-    #     try:
-    #         gold = Gold.Objects.get(hero_id=id)
-    #         serializer = GoldSerializer(gold)
-    #         return Response(serializer.data)
-    #     except Gold.DoesNotExist:
-    #         return Response({"detail": "Gold not found"}, status=404)
-    # def put(self, request, id):
-    #     try:
-    #         gold = Gold.objects.get(hero__id=id)
-    #         serializer = GoldSerializer(gold, data=request.data, partial=True)
-    #         if serializer.is_valid():
-    #             serializer.save()
-    #             return Response(serializer.data)
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #     except Gold.DoesNotExist:
-    #         return Response({"detail": "Gold not found"}, status=status.HTTP_404_NOT_FOUND)
-        
+    
+    def perform_create(self, serializer):
+        # Only set user on creation
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        # Don’t overwrite user during update
+        serializer.save()
+    
+    # def perform_update(self, serializer):
+    #     # Automatically attach the authenticated user
+    #     serializer.save(user=self.request.user)
+
 class AddWeaponToHero(APIView):
     def post(self, request, hero_id, weapon_id):
         hero = Hero.objects.get(id=hero_id)
