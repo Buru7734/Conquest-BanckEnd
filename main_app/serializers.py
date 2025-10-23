@@ -29,6 +29,7 @@ class GoldSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gold
         fields = '__all__'
+        read_only_fields = ['user']
         
 class WeaponSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Home, HeroList, HeroDetails,ShieldList,AddShieldToHero,RemoveShieldFromHero, ShieldDetails,WeaponList, WeaponDetails, AddWeaponToHero, RemoveWeaponFromHero,GoldDetails,GoldList, CreateUserView, LoginView, VerifyUserView, UserListView, PublicHeroList
+from .views import Home, HeroList, HeroDetails,ShieldList,AddShieldToHero,RemoveShieldFromHero, ShieldDetails,WeaponList, WeaponDetails, AddWeaponToHero, RemoveWeaponFromHero,GoldDetails,GoldList, CreateUserView, LoginView, VerifyUserView, UserListView, PublicHeroList, UserGoldDetails
 
 
 urlpatterns = [
@@ -20,6 +20,7 @@ urlpatterns = [
     path('heroes/<int:hero_id>/add_weapon/<int:weapon_id>/',AddWeaponToHero.as_view(), name='add-weapons'),
     path('heroes/<int:hero_id>/remove_weapon/<int:weapon_id>/',RemoveWeaponFromHero.as_view(), name='remove-weapons'),
     path('gold/',GoldList.as_view(), name='gold-list'),
-    path('gold/<int:id>/',GoldDetails.as_view(), name='gold-details')
+    path('gold/<int:id>/',GoldDetails.as_view(), name='gold-details'),
+    path('gold/users/<int:user_id>/', UserGoldDetails.as_view(), name='user-gold-list'),
     
 ]
