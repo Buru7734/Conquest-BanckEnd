@@ -10,29 +10,33 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['profile_picture']
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    
-    class Meta:
-        model= User
-        fields = ('id', 'username', 'email', 'password', 'profile')
-        
-    def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password']
-        )
-        
-        return user
-    
-    def update(self, instance, validated_data):
-     
-        validated_data.pop('email', None)
+    profile_picture = serializers.ImageField(source='profile.profile_picture', required=False)
 
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'password', 'profile_picture')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile', {})
+        picture = profile_data.get('profile_picture')
+
+        # Ensure profile exists
+        profile = getattr(instance, 'profile', None)
+        if not profile:
+            from .models import Profile
+            profile = Profile.objects.create(user=instance)
+
+        if picture:
+            profile.profile_picture = picture
+            profile.save()
+
+        # Handle password
         password = validated_data.pop('password', None)
         if password:
             instance.set_password(password)
 
+        # Update other fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
