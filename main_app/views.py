@@ -7,6 +7,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from .serializers import UserSerializer, HeroSerializer, ShieldSerializer, WeaponSerializer, GoldSerializer
 from .models import Hero, Shield, Weapon, Gold
+from rest_framework.parsers import MultiPartParser, FormParser
+
+
+
 
 
 class Home(APIView):
@@ -72,7 +76,8 @@ class UserListView(generics.ListAPIView):
 class UserDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    lookup_field = 'id'    
+    lookup_field = 'id' 
+    parser_classes = [MultiPartParser, FormParser]   
 
 class PublicHeroList(generics.ListAPIView):
     queryset = Hero.objects.all()
@@ -121,6 +126,11 @@ class GoldList(generics.ListCreateAPIView):
     def get_queryset(self):
         # Ensure only the logged-in user's gold is returned
         return Gold.objects.filter(user=self.request.user)
+    
+    def get_object(self):
+        # ✅ Ensure the user always has a gold record
+        gold, created = Gold.objects.get_or_create(user=self.request.user, defaults={'amount': 0})
+        return gold
 
     def list(self, request, *args, **kwargs):
         # Return a single object instead of a list
@@ -129,6 +139,14 @@ class GoldList(generics.ListCreateAPIView):
             serializer = self.get_serializer(gold)
             return Response(serializer.data)
         return Response({"detail": "No gold record found."}, status=404)
+
+class GoldView(generics.RetrieveAPIView):
+    serializer_class = GoldSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        gold, _ = Gold.objects.get_or_create(user=self.request.user, defaults={'amount': 0})
+        return gold
 
 
 class UserGoldDetails(generics.RetrieveAPIView):
