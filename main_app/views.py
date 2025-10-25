@@ -15,6 +15,8 @@ class Home(APIView):
         return Response(content)
 
     
+
+    
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -66,6 +68,11 @@ class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+class UserDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'id'    
 
 class PublicHeroList(generics.ListAPIView):
     queryset = Hero.objects.all()
@@ -178,3 +185,5 @@ class RemoveShieldFromHero(APIView):
         shield = Shield.objects.get(id=shield_id)
         hero.shields.remove(shield)
         return Response({'message': f'Shield {shield.shield} removed from Hero {hero.name}'})    
+    
+    
