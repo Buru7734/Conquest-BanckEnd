@@ -1,14 +1,20 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Hero, Shield, Weapon, Gold
+from .models import Hero, Shield, Weapon, Gold, Profile
 from django.contrib.auth.models import User
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['profile_picture']
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     
     class Meta:
         model= User
-        fields = ('id', 'username', 'email', 'password')
+        fields = ('id', 'username', 'email', 'password', 'profile')
         
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -19,6 +25,19 @@ class UserSerializer(serializers.ModelSerializer):
         
         return user
     
+    def update(self, instance, validated_data):
+     
+        validated_data.pop('email', None)
+
+        password = validated_data.pop('password', None)
+        if password:
+            instance.set_password(password)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
         
 class ShieldSerializer(serializers.ModelSerializer):
     class Meta:
