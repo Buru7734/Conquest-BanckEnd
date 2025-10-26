@@ -104,3 +104,18 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+class BattleLog(models.Model):
+    winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="battles_won")
+    loser = models.ForeignKey(User, on_delete=models.CASCADE, related_name="battles_lost")
+    attacker = models.ForeignKey(User, on_delete=models.CASCADE, related_name="battles_initiated")
+    hero_winner = models.CharField(max_length=100)
+    hero_loser = models.CharField(max_length=100)
+    gold_change_winner = models.IntegerField(default=0)
+    gold_change_loser = models.IntegerField(default=0)
+    is_read = models.BooleanField(default=False) 
+    hero_attacker = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.hero_winner} defeated {self.hero_loser} (by {self.attacker.username})"
