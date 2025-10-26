@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Hero, Shield, Weapon, Gold, Profile
+from .models import Hero, Shield, Weapon, Gold, Profile, BattleLog
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -69,3 +70,12 @@ class HeroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hero
         fields = '__all__'
+
+class BattleLogSerializer(serializers.ModelSerializer):
+    winner_name = serializers.CharField(source="winner.username", read_only=True)
+    loser_name = serializers.CharField(source="loser.username", read_only=True)
+    attacker_name = serializers.CharField(source="attacker.username", read_only=True)
+    
+    class Meta:
+        model = BattleLog
+        fields = "__all__"

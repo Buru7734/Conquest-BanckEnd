@@ -5,9 +5,10 @@ from rest_framework.response import Response
 from rest_framework import generics, status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from .serializers import UserSerializer, HeroSerializer, ShieldSerializer, WeaponSerializer, GoldSerializer
-from .models import Hero, Shield, Weapon, Gold
+from .serializers import UserSerializer, HeroSerializer, ShieldSerializer, WeaponSerializer, GoldSerializer, BattleLogSerializer
+from .models import Hero, Shield, Weapon, Gold, BattleLog
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.db.models import Q
 
 
 
@@ -29,7 +30,7 @@ class CreateUserView(generics.CreateAPIView):
         response = super().create(request, *args, **kwargs)
         user = User.objects.get(username=response.data['username'])
         
-        # ✅ Create a corresponding Gold record for the new user
+        #  Create a corresponding Gold record for the new user
         Gold.objects.get_or_create(user=user, defaults={"amount": 10})
         
         refresh = RefreshToken.for_user(user)
@@ -128,7 +129,7 @@ class GoldList(generics.ListCreateAPIView):
         return Gold.objects.filter(user=self.request.user)
     
     def get_object(self):
-        # ✅ Ensure the user always has a gold record
+        # Ensure the user always has a gold record
         gold, created = Gold.objects.get_or_create(user=self.request.user, defaults={'amount': 0})
         return gold
 
@@ -172,9 +173,6 @@ class GoldDetails(generics.RetrieveUpdateDestroyAPIView):
         # Don’t overwrite user during update
         serializer.save()
     
-    # def perform_update(self, serializer):
-    #     # Automatically attach the authenticated user
-    #     serializer.save(user=self.request.user)
 
 class AddWeaponToHero(APIView):
     def post(self, request, hero_id, weapon_id):
@@ -204,4 +202,39 @@ class RemoveShieldFromHero(APIView):
         hero.shields.remove(shield)
         return Response({'message': f'Shield {shield.shield} removed from Hero {hero.name}'})    
     
+class BattleLogCreateView(generics.CreateAPIView):
+    serializer_class = BattleLogSerializer
+    permission_classes = [permissions.IsAuthenticated]
     
+    def perform_create(self, serializer):
+        serializer.save(attacker=self.request.user)
+        
+class BattleLogListView(generics.ListAPIView):
+    serializer_class = BattleLogSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        return BattleLog.objects.filter(
+        Q(winner=user) | Q(loser=user) | Q(attacker=user)
+        ).order_by("-created_at")
+        
+class UnreadBattleLogsView(generics.ListAPIView):
+    serializer_class = BattleLogSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return BattleLog.objects.filter(
+            Q(winner=user) | Q(loser=user),
+            is_read=False
+        ).order_by("-created_at")
+
+# Mark all as read (optional, when user views notifications)
+from rest_framework.decorators import api_view, permission_classes
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def mark_battles_as_read(request):
+    user = request.user
+    BattleLog.objects.filter(Q(winner=user) | Q(loser=user), is_read=False).update(is_read=True)
+    return Response({"message": "All notifications marked as read"})

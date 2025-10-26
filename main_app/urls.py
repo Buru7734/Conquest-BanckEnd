@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Home, HeroList, HeroDetails,ShieldList,AddShieldToHero,RemoveShieldFromHero, UserDetails, ShieldDetails,WeaponList, WeaponDetails, AddWeaponToHero, RemoveWeaponFromHero,GoldDetails,GoldList, CreateUserView, LoginView, VerifyUserView, UserListView, PublicHeroList, UserGoldDetails
+from .views import Home, HeroList, HeroDetails,ShieldList,AddShieldToHero,RemoveShieldFromHero, UserDetails, ShieldDetails,WeaponList, WeaponDetails, AddWeaponToHero, RemoveWeaponFromHero,GoldDetails,GoldList, CreateUserView, LoginView, VerifyUserView, UserListView, PublicHeroList, UserGoldDetails, BattleLogListView, BattleLogCreateView, UnreadBattleLogsView, mark_battles_as_read
 
 
 urlpatterns = [
@@ -23,6 +23,10 @@ urlpatterns = [
     path('gold/',GoldList.as_view(), name='gold-list'),
     path('gold/<int:id>/',GoldDetails.as_view(), name='gold-details'),
     path('gold/users/<int:user_id>/', UserGoldDetails.as_view(), name='user-gold-list'),
+    path("battles/", BattleLogListView.as_view(), name="battle-log-list"),
+    path("battles/create/", BattleLogCreateView.as_view(), name="battle-log-create"),
+    path("battles/unread/", UnreadBattleLogsView.as_view(), name="battle-log-unread"),
+    path("battles/mark-read/", mark_battles_as_read, name="battle-log-mark-read"),
     
     
 ]
