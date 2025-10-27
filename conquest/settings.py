@@ -19,22 +19,16 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-
-
-ALLOWED_HOSTS = os.getenv(                                      # NEW
-    "DJANGO_ALLOWED_HOSTS",
-    ".up.railway.app,localhost,127.0.0.1"
-).split(",")
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Adjust the port if your frontend runs on a different one
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-insecure-key")  # NEW
 DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
@@ -114,12 +108,27 @@ SIMPLE_JWT = {
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),  # NEW
-        conn_max_age=600,
-    )
-}
+ENVIRONMENT = os.getenv("DJANGO_ENV", "development")
+
+if ENVIRONMENT == "production":
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.getenv("DATABASE_URL"),
+            conn_max_age=600,
+        )
+    }
+else:
+    # Local development — use SQLite or local Postgres
+   DATABASES = {
+    'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'conquest',
+            # 'USER': 'conquest_admin',
+            # 'PASSWORD': 'password',
+            # 'HOST': 'localhost',
+            # 'PORT': '5432',
+        }
+    }
 
 
 # Password validation
