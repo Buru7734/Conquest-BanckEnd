@@ -18,6 +18,19 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'password', 'profile_picture')
         extra_kwargs = {'password': {'write_only': True}}
 
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        user = User.objects.create_user(password=password, **validated_data)
+        # Create profile if profile_picture is provided
+        profile_data = validated_data.get('profile', {})
+        picture = profile_data.get('profile_picture') if profile_data else None
+        # Only create Profile if it doesn't exist
+        if not Profile.objects.filter(user=user).exists():
+            if picture:
+                Profile.objects.create(user=user, profile_picture=picture)
+            else:
+                Profile.objects.create(user=user)
+        return user
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', {})
         picture = profile_data.get('profile_picture')
