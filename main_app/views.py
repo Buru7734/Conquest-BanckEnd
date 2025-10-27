@@ -1,3 +1,4 @@
+from urllib import request
 from django.shortcuts import render
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
@@ -25,20 +26,20 @@ class Home(APIView):
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    
+
     def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        user = User.objects.get(username=response.data['username'])
-        
-        #  Create a corresponding Gold record for the new user
-        Gold.objects.get_or_create(user=user, defaults={"amount": 10})
-        
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-            'user': response.data
-        })             
+        try:
+            response = super().create(request, *args, **kwargs)
+            user = User.objects.get(username=response.data['username'])
+            Gold.objects.get_or_create(user=user, defaults={"amount": 10})
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': response.data
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 # Create your views here.
 class LoginView(APIView):
@@ -134,12 +135,9 @@ class GoldList(generics.ListCreateAPIView):
         return gold
 
     def list(self, request, *args, **kwargs):
-        # Return a single object instead of a list
-        gold = self.get_queryset().first()
-        if gold:
-            serializer = self.get_serializer(gold)
-            return Response(serializer.data)
-        return Response({"detail": "No gold record found."}, status=404)
+        gold, created = Gold.objects.get_or_create(user=request.user, defaults={'amount': 0})
+        serializer = self.get_serializer(gold)
+        return Response(serializer.data)
 
 class GoldView(generics.RetrieveAPIView):
     serializer_class = GoldSerializer
