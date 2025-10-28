@@ -48,7 +48,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # your React local frontend
-    "https://conquestheroes.netlify.app/",  # your Netlify online frontend
+    "https://conquestheroes.netlify.app",  # your Netlify online frontend
 ]
 
 # CORS_ALLOW_ALL_ORIGINS = True
