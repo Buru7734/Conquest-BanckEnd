@@ -49,6 +49,6 @@ class Migration(migrations.Migration):
         ),
     ]
 
-User = get_user_model()
-for user in User.objects.all():
-    print(user)
+# User = get_user_model()
+# for user in User.objects.all():
+#     print(user)

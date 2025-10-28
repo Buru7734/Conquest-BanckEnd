@@ -110,25 +110,25 @@ SIMPLE_JWT = {
 
 ENVIRONMENT = os.getenv("DJANGO_ENV", "development")
 
-if ENVIRONMENT == "production":
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=os.getenv("DATABASE_URL"),
-            conn_max_age=600,
-        )
-    }
-else:
-    # Local development — use SQLite or local Postgres
-   DATABASES = {
-    'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'conquest',
-            # 'USER': 'conquest_admin',
-            # 'PASSWORD': 'password',
-            # 'HOST': 'localhost',
-            # 'PORT': '5432',
-        }
-    }
+# Database configuration
+# ---------------------------------------------------------
+db_url = os.getenv("DATABASE_URL")
+
+# Safety check: if the env var is empty or invalid, fallback to local Postgres
+if not db_url or db_url.strip() in ("", "://"):
+    print("⚠️  No valid DATABASE_URL found — using local PostgreSQL.")
+    db_url = "postgresql://santiagoaramburu@localhost:5432/conquest"
+
+DATABASES = {
+    "default": dj_database_url.config(default=db_url, conn_max_age=600)
+}
+
+# Force SSL and production optimizations when deployed
+if "RAILWAY_ENVIRONMENT" in os.environ:
+    DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
+    ALLOWED_HOSTS = ["*"]  # or your Railway domain
+    DEBUG = False
+
 
 
 # Password validation
@@ -174,6 +174,25 @@ STORAGES = {
     },
 }
 
+ON_RAILWAY = "RAILWAY_ENVIRONMENT" in os.environ
+
+
+if ON_RAILWAY:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+# ---------------------------------------------------------
+# CORS CONFIGURATION
+# ---------------------------------------------------------
+if ON_RAILWAY:
+    # Replace this with your deployed frontend URL once live
+    CORS_ALLOWED_ORIGINS = [
+        "https://your-frontend-domain.vercel.app",
+    ]
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+    ]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -182,4 +201,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-import dj_database_url 
