@@ -23,19 +23,33 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-ALLOWED_HOSTS = os.getenv(
-    "DJANGO_ALLOWED_HOSTS",
-    ".up.railway.app,localhost,127.0.0.1"
-).split(",")
+# ALLOWED_HOSTS = os.getenv(
+#     "DJANGO_ALLOWED_HOSTS",
+#     ".up.railway.app,localhost,127.0.0.1",
+# ).split(",")
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Adjust the port if your frontend runs on a different one
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",  # Adjust the port if your frontend runs on a different one
+# ]
+
+# CSRF_TRUSTED_ORIGINS = os.getenv(                             
+#     "CSRF_TRUSTED_ORIGINS",
+#     "https://*.up.railway.app"
+# ).split(",")
+
+ALLOWED_HOSTS = ['conquest-banckend-production.up.railway.app', '127.0.0.1', "localhost"]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://conquest-banckend-production.up.railway.app",
+    "https://conquestheroes.netlify.app",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
 ]
 
-CSRF_TRUSTED_ORIGINS = os.getenv(                             
-    "CSRF_TRUSTED_ORIGINS",
-    "https://*.up.railway.app"
-).split(",")
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # your React local frontend
+    "https://conquestheroes.netlify.app/",  # your Netlify online frontend
+]
 
 # CORS_ALLOW_ALL_ORIGINS = True
 
