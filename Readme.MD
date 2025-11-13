@@ -8,7 +8,6 @@ Conquest is a fantasy combat web application where users create heroes then batt
 
 ## Getting Started
 - **Repo** [Github Repo](https://github.com/Buru7734/Conquest-BanckEnd)
-- **Deployed App:** [Link to your deployed app](https://conquest-banckend-production.up.railway.app)
 - **Planning Materials:** [Link to your planning docs](https://trello.com/b/ZaHKZpcn/ga-unit-4-project)
 
 ## Technologies Used
